@@ -1,0 +1,6 @@
+Package: sbt
+Version: 1.0.0-1
+Architecture: all
+Maintainer: jimyoshida
+Depends: genisoimage, rsync, python3-typer
+Description: Python Typer-based wrapper for mkisofs and rsync.

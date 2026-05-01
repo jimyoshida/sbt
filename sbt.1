@@ -1,0 +1,160 @@
+.TH SBT 1 "2026-05-01" "backup-utils 1.0.0" "User Commands"
+.SH NAME
+sbt \- simple backup tool: directory sync and ISO archive
+.SH SYNOPSIS
+.B sbt sync
+.RI [ OPTIONS ]
+.I SRCPATH
+.I DSTPATH
+.PP
+.B sbt archive
+.RI [ OPTIONS ]
+.I SRCPATH
+.I VOLNAME
+.RI [ PUBNAME ]
+.PP
+.B sbt
+.I COMMAND
+.B \-\-help
+.SH DESCRIPTION
+.B sbt
+is a backup utility with two subcommands:
+.B sync
+for incremental directory snapshots and
+.B archive
+for ISO image creation.
+.SS sbt sync
+Backs up
+.I SRCPATH
+into a timestamped snapshot directory under
+.IR DSTPATH .
+Snapshot directories are named
+.BI backup- YYYYMMDD-HHMMSS \fR.
+.PP
+By default an incremental backup is performed: the most recent
+.BI backup- *
+directory found in
+.I DSTPATH
+is used as the
+.B \-\-link\-dest
+reference so that unchanged files are stored as hardlinks rather than copies.
+Each snapshot therefore appears complete while consuming only the space of
+the changed files.
+If no prior snapshot exists, or if
+.B \-\-full
+is given, a full backup is performed instead.
+.SS sbt archive
+Produces an ISO 9660 image from the contents of a directory via
+.BR mkisofs (1).
+The output file is written to
+.IB VOLNAME .iso
+in the current working directory.
+Joliet and Rock Ridge extensions are enabled so the image is readable on
+both Windows and UNIX-like systems without filename mangling.
+.SH ARGUMENTS
+.SS sbt sync
+.TP
+.I SRCPATH
+Path to the directory to back up.
+.TP
+.I DSTPATH
+Absolute path to the directory that will hold all snapshots.
+.SS sbt archive
+.TP
+.I SRCPATH
+Path to the source directory whose contents will be packed into the image.
+.TP
+.I VOLNAME
+Volume identifier embedded in the image header.
+Also used as the base name of the output file
+.RI ( VOLNAME .iso ).
+.TP
+.I PUBNAME
+Publisher string embedded in the image header.
+Optional.
+.SH OPTIONS
+.SS sbt sync
+.TP
+.BR \-\-full " / " \-\-no\-full
+Force a full backup even when a prior snapshot exists.
+Default:
+.BR \-\-no\-full .
+.TP
+.B \-\-help
+Show a usage summary and exit.
+.SS sbt archive
+.TP
+.B \-\-help
+Show a usage summary and exit.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+A subprocess
+.RB ( rsync (1)
+or
+.BR mkisofs (1))
+returned an error.
+.TP
+.B 2
+Invalid or missing arguments (Typer usage error).
+.SH EXAMPLES
+Incremental backup of
+.I /home/alice
+into
+.IR /mnt/nas/backups :
+.PP
+.RS
+.EX
+sbt sync /home/alice /mnt/nas/backups
+# creates /mnt/nas/backups/backup-20260501-120000
+# unchanged files are hardlinks to the prior snapshot
+.EE
+.RE
+.PP
+Force a full backup regardless of existing snapshots:
+.PP
+.RS
+.EX
+sbt sync --full /home/alice /mnt/nas/backups
+.EE
+.RE
+.PP
+Create
+.I backup.iso
+from
+.IR /data/docs :
+.PP
+.RS
+.EX
+sbt archive /data/docs backup "ACME Corp"
+.EE
+.RE
+.PP
+Omit the publisher name:
+.PP
+.RS
+.EX
+sbt archive /data/docs backup
+.EE
+.RE
+.SH DEPENDENCIES
+.B sbt sync
+requires
+.BR rsync (1).
+.PP
+.B sbt archive
+requires
+.BR mkisofs (1)
+(provided by the
+.B genisoimage
+package on Debian/Ubuntu).
+.SH SEE ALSO
+.BR rsync (1),
+.BR mkisofs (1),
+.BR genisoimage (1),
+.BR isoinfo (1)
+.SH AUTHORS
+jimyoshida
