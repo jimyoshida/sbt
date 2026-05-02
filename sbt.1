@@ -4,14 +4,13 @@ sbt \- simple backup tool: directory sync and ISO archive
 .SH SYNOPSIS
 .B sbt sync
 .RI [ OPTIONS ]
-.I SRCPATH
-.I DSTPATH
+.I SRCDIR
+.I DSTDIR
 .PP
 .B sbt archive
 .RI [ OPTIONS ]
-.I SRCPATH
-.I VOLNAME
-.RI [ PUBNAME ]
+.I SRCDIR
+.I DSTDIR
 .PP
 .B sbt
 .I COMMAND
@@ -25,16 +24,16 @@ for incremental directory snapshots and
 for ISO image creation.
 .SS sbt sync
 Backs up
-.I SRCPATH
+.I SRCDIR
 into a timestamped snapshot directory under
-.IR DSTPATH .
+.IR DSTDIR .
 Snapshot directories are named
 .BI backup- YYYYMMDD-HHMMSS \fR.
 .PP
 By default an incremental backup is performed: the most recent
 .BI backup- *
 directory found in
-.I DSTPATH
+.I DSTDIR
 is used as the
 .B \-\-link\-dest
 reference so that unchanged files are stored as hardlinks rather than copies.
@@ -44,34 +43,41 @@ If no prior snapshot exists, or if
 .B \-\-full
 is given, a full backup is performed instead.
 .SS sbt archive
-Produces an ISO 9660 image from the contents of a directory via
+Produces an ISO 9660 image from the contents of
+.I SRCDIR
+via
 .BR mkisofs (1).
 The output file is written to
+.I DSTDIR
+as
 .IB VOLNAME .iso
-in the current working directory.
+(where
+.I VOLNAME
+defaults to the name of
+.I SRCDIR
+converted to uppercase).
+.I DSTDIR
+is created automatically if it does not exist.
 Joliet and Rock Ridge extensions are enabled so the image is readable on
 both Windows and UNIX-like systems without filename mangling.
 .SH ARGUMENTS
 .SS sbt sync
 .TP
-.I SRCPATH
+.I SRCDIR
 Path to the directory to back up.
 .TP
-.I DSTPATH
+.I DSTDIR
 Absolute path to the directory that will hold all snapshots.
 .SS sbt archive
 .TP
-.I SRCPATH
+.I SRCDIR
 Path to the source directory whose contents will be packed into the image.
 .TP
-.I VOLNAME
-Volume identifier embedded in the image header.
-Also used as the base name of the output file
-.RI ( VOLNAME .iso ).
-.TP
-.I PUBNAME
-Publisher string embedded in the image header.
-Optional.
+.I DSTDIR
+Directory where the output
+.I .iso
+file will be written.
+Created automatically if it does not exist.
 .SH OPTIONS
 .SS sbt sync
 .TP
@@ -83,6 +89,25 @@ Default:
 .B \-\-help
 Show a usage summary and exit.
 .SS sbt archive
+.TP
+.BI \-\-volname " VOLNAME"
+Volume identifier embedded in the image header and used as the base name of
+the output file
+.RI ( VOLNAME .iso ).
+Defaults to the name of
+.I SRCDIR
+converted to uppercase.
+Must consist solely of uppercase letters
+.RB ( A \(enZ ),
+digits
+.RB ( 0 \(en9 ),
+and underscores
+.RB ( _ ),
+with a maximum of 32 characters (ISO 9660 restrictions).
+.TP
+.BI \-\-pubname " PUBNAME"
+Publisher string embedded in the image header.
+Optional.
 .TP
 .B \-\-help
 Show a usage summary and exit.
@@ -96,7 +121,9 @@ A subprocess
 .RB ( rsync (1)
 or
 .BR mkisofs (1))
-returned an error.
+returned an error, or a validation check failed (missing source directory,
+volume name too long, volume name contains invalid characters,
+output file already exists).
 .TP
 .B 2
 Invalid or missing arguments (Typer usage error).
@@ -123,21 +150,24 @@ sbt sync --full /home/alice /mnt/nas/backups
 .RE
 .PP
 Create
-.I backup.iso
+.I DOCS.iso
 from
-.IR /data/docs :
+.I /data/docs
+in
+.IR /mnt/iso
+(the source directory name is automatically uppercased):
 .PP
 .RS
 .EX
-sbt archive /data/docs backup "ACME Corp"
+sbt archive /data/docs /mnt/iso
 .EE
 .RE
 .PP
-Omit the publisher name:
+Override the volume name and set a publisher:
 .PP
 .RS
 .EX
-sbt archive /data/docs backup
+sbt archive /data/docs /mnt/iso --volname DOCS --pubname "ACME Corp"
 .EE
 .RE
 .SH DEPENDENCIES

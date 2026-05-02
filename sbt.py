@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -9,19 +10,10 @@ import typer
 app = typer.Typer()
 
 
-# tutorial as-is
 @app.command()
-def goodbye(name: str, formal: bool = False):
-    if formal:
-        typer.echo(f"Goodbye Ms. {name}. Have a good day.")
-    else:
-        typer.echo(f"Bye {name}!")
-
-
-@app.command()
-def sync(srcpath: str, dstpath: str, full: bool = False):
-    src = Path(srcpath)
-    dst = Path(dstpath)
+def sync(srcdir: str, dstdir: str, full: bool = False):
+    src = Path(srcdir)
+    dst = Path(dstdir)
     snapshot = dst / f"backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
     prior = None
@@ -44,11 +36,40 @@ def sync(srcpath: str, dstpath: str, full: bool = False):
 
 
 @app.command()
-def archive(srcpath: str, volname: str, pubname: Optional[str] = None):
-    cmd = ["mkisofs", "-J", "-r", "-U", "-D", "-V", volname]
+def archive(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Optional[str] = None):
+    src = Path(srcdir)
+    dst = Path(dstdir)
+
+    if not src.is_dir():
+        typer.echo(f"Error: source directory '{srcdir}' does not exist.", err=True)
+        raise typer.Exit(1)
+
+    vol = volname or src.name.upper()
+    if len(vol) > 32:
+        typer.echo(f"Error: volume name '{vol}' exceeds the ISO9660 maximum of 32 characters.", err=True)
+        raise typer.Exit(1)
+    if not re.fullmatch(r"[A-Z0-9_]+", vol):
+        typer.echo(f"Error: volume name '{vol}' contains characters outside the ISO9660 allowed set (A-Z, 0-9, _).", err=True)
+        raise typer.Exit(1)
+
+    dst.mkdir(parents=True, exist_ok=True)
+
+    iso_path = dst / f"{vol}.iso"
+    if iso_path.exists():
+        typer.echo(f"Error: '{iso_path}' already exists.", err=True)
+        raise typer.Exit(1)
+
+    cmd = [
+        "mkisofs",
+        "-J",       # Joliet: Windows-compatible long filenames
+        "-r",       # Rock Ridge: preserve Unix file attributes and symlinks
+        "-U",       # allow untranslated filenames up to 31 characters
+        "-D",       # disable deep directory relocation
+        "-V", vol,  # volume label
+    ]
     if pubname:
-        cmd += ["-P", pubname]
-    cmd += ["-o", f"{volname}.iso", srcpath]
+        cmd += ["-P", pubname]  # publisher name embedded in the ISO header
+    cmd += ["-o", str(iso_path), str(src)]
 
     result = subprocess.run(cmd)
     if result.returncode != 0:
