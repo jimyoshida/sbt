@@ -45,11 +45,8 @@ def archive(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Op
         raise typer.Exit(1)
 
     vol = volname or src.name.upper()
-    if len(vol) > 32:
-        typer.echo(f"Error: volume name '{vol}' exceeds the ISO9660 maximum of 32 characters.", err=True)
-        raise typer.Exit(1)
-    if not re.fullmatch(r"[A-Z0-9_]+", vol):
-        typer.echo(f"Error: volume name '{vol}' contains characters outside the ISO9660 allowed set (A-Z, 0-9, _).", err=True)
+    if not re.fullmatch(r"[A-Z0-9_]{1,32}", vol):
+        typer.echo(f"Error: volume name '{vol}' must be 1–32 characters of A-Z, 0-9, or _.", err=True)
         raise typer.Exit(1)
 
     dst.mkdir(parents=True, exist_ok=True)
