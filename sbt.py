@@ -45,8 +45,8 @@ def iso(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Option
         raise typer.Exit(1)
 
     vol = volname or src.name.upper()
-    if not re.fullmatch(r"[A-Z0-9_-]{1,32}", vol):
-        typer.echo(f"Error: volume name '{vol}' must be 1-32 characters of A-Z, 0-9, _ or -.", err=True)
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,32}", vol):
+        typer.echo(f"Error: volume name '{vol}' must be 1-32 characters of A-Z, a-z, 0-9, _ or -.", err=True)
         raise typer.Exit(1)
 
     try:
