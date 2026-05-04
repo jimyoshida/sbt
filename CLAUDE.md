@@ -21,7 +21,7 @@ There are no automated tests; testing is done by running the CLI manually.
 
 The entire application lives in a single file: `sbt.py` (~60 lines). It uses [Typer](https://typer.tiangolo.com/) to expose two commands:
 
-- **`sbt sync <srcdir> <dstdir>`** — incremental/full directory backups using `rsync`. Creates timestamped snapshot directories (`backup-YYYYMMDD-HHMMSS`). Supports hardlink-based incremental backups via rsync's `--link-dest`. Pass `--full` to force a full backup.
+- **`sbt sync <srcdir> <dstdir>`** — incremental/full directory backups using `rsync`. Snapshots go under `<dstdir>/<srcdir-basename>/backup-YYYYMMDD-HHMMSS`. Supports hardlink-based incremental backups via rsync's `--link-dest`. Pass `--full` to force a full backup. SRC must be an existing directory.
 - **`sbt iso <srcdir> <dstdir>`** — creates ISO 9660 images from a directory using `mkisofs` (provided by `genisoimage`). Outputs `<VOLNAME>.iso` in `<dstdir>` (created if absent), with Joliet and Rock Ridge extensions for cross-platform compatibility. `--volname` defaults to the source directory name uppercased; must be letters (upper or lower), digits, underscores, and hyphens only, max 32 characters. `--pubname` sets the publisher string in the image header.
 
 External tools are invoked via `subprocess.run()`. Errors result in `typer.Exit(1)`.

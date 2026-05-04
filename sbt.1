@@ -26,14 +26,18 @@ for ISO image creation.
 Backs up
 .I SRCDIR
 into a timestamped snapshot directory under
-.IR DSTDIR .
+.IB DSTDIR / SRCNAME
+where
+.I SRCNAME
+is the base name of
+.IR SRCDIR .
 Snapshot directories are named
 .BI backup- YYYYMMDD-HHMMSS \fR.
 .PP
 By default an incremental backup is performed: the most recent
 .BI backup- *
 directory found in
-.I DSTDIR
+.IB DSTDIR / SRCNAME
 is used as the
 .B \-\-link\-dest
 reference so that unchanged files are stored as hardlinks rather than copies.
@@ -67,7 +71,12 @@ both Windows and UNIX-like systems without filename mangling.
 Path to the directory to back up.
 .TP
 .I DSTDIR
-Absolute path to the directory that will hold all snapshots.
+Root backup directory. Snapshots are placed under
+.IB DSTDIR / SRCNAME
+where
+.I SRCNAME
+is the base name of
+.IR SRCDIR .
 .SS sbt iso
 .TP
 .I SRCDIR
@@ -137,7 +146,7 @@ into
 .RS
 .EX
 sbt sync /home/alice /mnt/nas/backups
-# creates /mnt/nas/backups/backup-20260501-120000
+# creates /mnt/nas/backups/alice/backup-20260501-120000
 # unchanged files are hardlinks to the prior snapshot
 .EE
 .RE

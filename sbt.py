@@ -13,7 +13,17 @@ app = typer.Typer()
 @app.command()
 def sync(srcdir: str, dstdir: str, full: bool = False):
     src = Path(srcdir)
-    dst = Path(dstdir)
+    if not src.is_dir():
+        typer.echo(f"Error: source directory '{srcdir}' does not exist.", err=True)
+        raise typer.Exit(1)
+
+    dst = Path(dstdir) / src.name
+    try:
+        dst.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        typer.echo(f"Error: cannot create '{dstdir}' — permission denied.", err=True)
+        raise typer.Exit(1)
+
     snapshot = dst / f"backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
     prior = None
