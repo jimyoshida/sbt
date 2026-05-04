@@ -72,6 +72,7 @@ def iso(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Option
         cmd += ["-P", pubname]  # publisher name embedded in the ISO header
     cmd += ["-o", str(iso_path), str(src)]
 
+    typer.echo(f"💿 Creating ISO '{vol}' from '{src}' → '{iso_path}'")
     result = subprocess.run(cmd)
     if result.returncode != 0:
         raise typer.Exit(1)
