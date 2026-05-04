@@ -36,7 +36,7 @@ def sync(srcdir: str, dstdir: str, full: bool = False):
 
 
 @app.command()
-def archive(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Optional[str] = None):
+def iso(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Optional[str] = None):
     src = Path(srcdir)
     dst = Path(dstdir)
 
@@ -46,7 +46,7 @@ def archive(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Op
 
     vol = volname or src.name.upper()
     if not re.fullmatch(r"[A-Z0-9_]{1,32}", vol):
-        typer.echo(f"Error: volume name '{vol}' must be 1–32 characters of A-Z, 0-9, or _.", err=True)
+        typer.echo(f"Error: volume name '{vol}' must be 1-32 characters of A-Z, 0-9, or _.", err=True)
         raise typer.Exit(1)
 
     dst.mkdir(parents=True, exist_ok=True)

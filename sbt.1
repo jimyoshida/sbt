@@ -7,7 +7,7 @@ sbt \- simple backup tool: directory sync and ISO archive
 .I SRCDIR
 .I DSTDIR
 .PP
-.B sbt archive
+.B sbt iso
 .RI [ OPTIONS ]
 .I SRCDIR
 .I DSTDIR
@@ -20,7 +20,7 @@ sbt \- simple backup tool: directory sync and ISO archive
 is a backup utility with two subcommands:
 .B sync
 for incremental directory snapshots and
-.B archive
+.B iso
 for ISO image creation.
 .SS sbt sync
 Backs up
@@ -42,7 +42,7 @@ the changed files.
 If no prior snapshot exists, or if
 .B \-\-full
 is given, a full backup is performed instead.
-.SS sbt archive
+.SS sbt iso
 Produces an ISO 9660 image from the contents of
 .I SRCDIR
 via
@@ -68,7 +68,7 @@ Path to the directory to back up.
 .TP
 .I DSTDIR
 Absolute path to the directory that will hold all snapshots.
-.SS sbt archive
+.SS sbt iso
 .TP
 .I SRCDIR
 Path to the source directory whose contents will be packed into the image.
@@ -88,7 +88,7 @@ Default:
 .TP
 .B \-\-help
 Show a usage summary and exit.
-.SS sbt archive
+.SS sbt iso
 .TP
 .BI \-\-volname " VOLNAME"
 Volume identifier embedded in the image header and used as the base name of
@@ -158,7 +158,7 @@ in
 .PP
 .RS
 .EX
-sbt archive /data/docs /mnt/iso
+sbt iso /data/docs /mnt/iso
 .EE
 .RE
 .PP
@@ -166,7 +166,7 @@ Override the volume name and set a publisher:
 .PP
 .RS
 .EX
-sbt archive /data/docs /mnt/iso --volname DOCS --pubname "ACME Corp"
+sbt iso /data/docs /mnt/iso --volname DOCS --pubname "ACME Corp"
 .EE
 .RE
 .SH DEPENDENCIES
@@ -174,7 +174,7 @@ sbt archive /data/docs /mnt/iso --volname DOCS --pubname "ACME Corp"
 requires
 .BR rsync (1).
 .PP
-.B sbt archive
+.B sbt iso
 requires
 .BR mkisofs (1)
 (provided by the
