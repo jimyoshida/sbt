@@ -49,7 +49,11 @@ def iso(srcdir: str, dstdir: str, volname: Optional[str] = None, pubname: Option
         typer.echo(f"Error: volume name '{vol}' must be 1-32 characters of A-Z, 0-9, or _.", err=True)
         raise typer.Exit(1)
 
-    dst.mkdir(parents=True, exist_ok=True)
+    try:
+        dst.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        typer.echo(f"Error: cannot create '{dst}' — permission denied. Check the path exists and is writable (WSL drive paths are case-sensitive, e.g. /mnt/e not /mnt/E).", err=True)
+        raise typer.Exit(1)
 
     iso_path = dst / f"{vol}.iso"
     if iso_path.exists():
