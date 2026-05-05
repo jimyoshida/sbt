@@ -1,5 +1,10 @@
 # sbt (simple backup tool)
 
+A free, CLI-based basic feature alternative to:
+
+- **[AnyToISO](https://crystalidea.com/anytoiso)** (GUI; free for small folders, paid for large) — use `sbt iso` to convert folders to ISO images
+- **[AOMEI Backupper](https://www.aomeitech.com/ab/)** (freeware GUI) — use `sbt sync` for incremental directory backups
+
 See also `DEBIAN/control`.
 
 ## Build
