@@ -7,10 +7,10 @@ $(PKG_FILE): sbt.py sbt.1 DEBIAN/control build-deb.sh Makefile
 	bash -x build-deb.sh $(PKG_FILE)
 
 install:
-	dpkg -i $(PKG_FILE)
+	apt install ./$(PKG_FILE)
 
 uninstall:
-	dpkg -r $(PKG_NAME)
+	apt remove $(PKG_NAME)
 
 clean:
 	rm -fr out/ tmp/

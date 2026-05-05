@@ -7,15 +7,26 @@ A free, CLI-based basic feature alternative to:
 
 See also `DEBIAN/control`.
 
+## System Requirements
+
+**Runtime** (automatically installed as `.deb` dependencies):
+
+* Ubuntu 24.04+ (including WSL)
+* `rsync`
+* `genisoimage` (provides `mkisofs`)
+* `python3-typer`
+
+**Build environment** (package names for `apt`):
+
+* Ubuntu 24.04+ (including WSL)
+* `make` (GNU Make)
+* `dpkg` (provides `dpkg-deb`)
+
 ## Build
 
-To build the package, you will need:
+Run `make` to generate the deb package at `out/sbt_<version>_all.deb`, where `<version>` reflects the value in `DEBIAN/control`.
 
-* Ubuntu 24.04+
-* GNU Make 4.3+
-* dpkg-deb (included in the `dpkg` package)
-
-Run `make` to generate the deb package.
+> **Limitation:** the version is fixed at `1.0.0-1` and not incremented between releases.
 
 ## Install
 
